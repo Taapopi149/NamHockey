@@ -1,6 +1,9 @@
+import android.widget.Space
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -17,8 +20,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key.Companion.Window
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import com.example.namhockey.R
+import com.google.rpc.Help
+import kotlinx.coroutines.launch
 
 data class NewsItem(val title: String, val description: String, val imageRes: Int)
 data class HighlightItem(val imageRes: Int, val title: String)
@@ -26,6 +41,8 @@ data class HighlightItem(val imageRes: Int, val title: String)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage() {
+
+
     val newsList = listOf(
         NewsItem(
             title = "Team A wins 4-2!",
@@ -54,115 +71,200 @@ fun HomePage() {
 
     val listState = rememberLazyListState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Nam Hockey Union",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+
+    var drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerContent = {
+            ModalDrawerSheet {
+                Column (
+                    modifier = Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState())
+                ){
+                    Spacer(Modifier.height(12.dp))
+
+                    Text("Profile Picture", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
+
+
+                    HorizontalDivider()
+
+                    Text("Get Involved", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
+                    NavigationDrawerItem(
+                        label = { Text("Find Club") },
+                        selected = false,
+                        onClick = {/* handle click */}
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { println("Profile clicked") }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.user),
-                            contentDescription = "Profile",
-                            tint = Color.Black,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.Black,
-                    navigationIconContentColor = Color.Black
-                ),
-                scrollBehavior = scrollBehavior
-            )
-        },
-        content = { innerPadding ->
-            LazyColumn(
-                state = listState,
-                contentPadding = innerPadding,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection) // <- connect scroll behavior
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                item {
-                    SectionTitle(title = "Latest News")
-                }
-                items(newsList) { news ->
-                    NewsCard(news = news, onClick = {
-                        println("Clicked on ${news.title}")
-                    })
-                }
+                    NavigationDrawerItem(
+                        label = { Text("Register Club") },
+                        selected = false,
+                        onClick = {/* handle click */}
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Coach") },
+                        selected = false,
+                        onClick = {/* handle click */}
+                    )
 
-                item {
-                    SectionTitle(title = "Game Highlights")
-                }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                item {
-                    HighlightCarousel(highlights = highlightList)
+                    Text("Help & Settings", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
+                    NavigationDrawerItem(
+                        label = {Text("Settings")},
+                        selected = false,
+                        icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+                        onClick = {/*Handle Click*/}
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Help and feedback") },
+                        selected = false,
+                        icon = { Icon(Icons.Outlined.Call, contentDescription = null) },
+                        onClick = { /* Handle click */ },
+                    )
+                    Spacer(Modifier.height(12.dp))
                 }
             }
-        }
+        },
+        drawerState = drawerState
     )
+    {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Nam Hockey Union",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            scope.launch {
+                                if (drawerState.isClosed) {
+                                    drawerState.open()
+                                } else {
+                                    drawerState.close()
+                                }
+
+                            }
+
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.user),
+                                contentDescription = "Profile",
+                                tint = Color.Black,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.White,
+                        titleContentColor = Color.Black,
+                        navigationIconContentColor = Color.Black
+                    ),
+                    scrollBehavior = scrollBehavior
+                )
+            },
+            content = { innerPadding ->
+                LazyColumn(
+                    state = listState,
+                    contentPadding = innerPadding,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection) // <- connect scroll behavior
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    item {
+                        SectionTitle(title = "Latest News")
+                    }
+                    items(newsList) { news ->
+                        NewsCard(news = news, onClick = {
+                            println("Clicked on ${news.title}")
+                        })
+                    }
+
+                    item {
+                        SectionTitle(title = "Game Highlights")
+                    }
+
+                    item {
+                        HighlightCarousel(highlights = highlightList)
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun StoryLikePage (){
+    Row {  }
 }
 
 @Composable
 fun SectionTitle(title: String) {
     Text(
         text = title,
-        fontSize = 24.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = Color(0xFF81D4FA),
-        modifier = Modifier.padding(vertical = 8.dp)
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color(0xFF0288D1),
+        modifier = Modifier
+            .padding(vertical = 12.dp)
     )
 }
 
+
 @Composable
 fun NewsCard(news: NewsItem, onClick: () -> Unit) {
-    var scale by remember { mutableStateOf(1f) }
+    var pressed by remember { mutableStateOf(false) }
+
+    val scale by animateFloatAsState(targetValue = if (pressed) 0.97f else 1f, label = "scale")
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .scale(scale)
-            .clickable {
-                scale = 0.95f
-                onClick()
-                scale = 1f
-            }
-            .animateContentSize(),
+            .padding(vertical = 10.dp)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .clickable(
+                onClick = onClick,
+                onClickLabel = "Open news"
+            )
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        pressed = true
+                        tryAwaitRelease()
+                        pressed = false
+                    }
+                )
+            },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 10.dp
         )
     ) {
         Column {
             Image(
                 painter = painterResource(id = news.imageRes),
                 contentDescription = "News Image",
-                modifier = Modifier
+                contentScale = ContentScale.Crop
+                ,modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
 
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = news.title,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = news.description,
                     fontSize = 14.sp,
@@ -172,6 +274,7 @@ fun NewsCard(news: NewsItem, onClick: () -> Unit) {
         }
     }
 }
+
 
 @Composable
 fun HighlightCarousel(highlights: List<HighlightItem>) {
@@ -186,18 +289,19 @@ fun HighlightCarousel(highlights: List<HighlightItem>) {
     }
 }
 
+
 @Composable
 fun HighlightCard(highlight: HighlightItem) {
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
-            .size(width = 200.dp, height = 150.dp)
+            .width(180.dp)
             .padding(horizontal = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE1F5FE)
+            containerColor = Color.White
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
+            defaultElevation = 8.dp
         )
     ) {
         Column {
@@ -206,15 +310,18 @@ fun HighlightCard(highlight: HighlightItem) {
                 contentDescription = "Highlight Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
+                    .height(110.dp)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             )
 
             Text(
                 text = highlight.title,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(8.dp)
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(12.dp),
+                color = Color(0xFF0288D1)
             )
         }
     }
 }
+
