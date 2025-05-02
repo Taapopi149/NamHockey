@@ -253,7 +253,7 @@ fun TeamCard(team: teamItem){
             .size(90.dp)
             .padding(10.dp)
             .border(
-                BorderStroke(3.dp, Color.Yellow),
+                BorderStroke(3.dp, Color.Black),
                 CircleShape
             )
             .clip(CircleShape)
