@@ -1,7 +1,9 @@
 import android.widget.Space
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -21,9 +23,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
@@ -31,12 +35,14 @@ import androidx.compose.ui.input.key.Key.Companion.Window
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import com.example.namhockey.R
 import com.google.rpc.Help
 import kotlinx.coroutines.launch
 
 data class NewsItem(val title: String, val description: String, val imageRes: Int)
 data class HighlightItem(val imageRes: Int, val title: String)
+data class teamItem( val imageRes: Int, val name: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +67,14 @@ fun HomePage() {
         )
     )
 
+    val teamList = listOf(
+
+        teamItem(R.drawable.teama, "My Team" ),
+        teamItem(R.drawable.team3, "The School of excellence hockey Club"),
+        teamItem(R.drawable.team5, "Windhoek Old Boys"),
+        teamItem(R.drawable.team4, "DTS Hockey Club")
+    )
+
     val highlightList = listOf(
         HighlightItem(R.drawable.hockeysample, "Epic Shootout!"),
         HighlightItem(R.drawable.hockeysample, "Insane Save!"),
@@ -79,12 +93,38 @@ fun HomePage() {
         drawerContent = {
             ModalDrawerSheet {
                 Column (
-                    modifier = Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState())
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState())
                 ){
                     Spacer(Modifier.height(12.dp))
 
-                    Text("Profile Picture", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
+                    Image(
+                        painter = painterResource(id = R.drawable.profilepic),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .border(
+                                BorderStroke(4.dp, Color.Blue),
+                                CircleShape
+                            )
+                            .padding(4.dp)
+                            .clip(CircleShape)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
 
+                    Text(
+                        text = "Taapopi Ndeshipanda",
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    NavigationDrawerItem(
+                        label = { Text("Account") },
+                        icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
+                        selected = false,
+                        onClick = {}
+                    )
 
                     HorizontalDivider()
 
@@ -174,6 +214,12 @@ fun HomePage() {
                         .nestedScroll(scrollBehavior.nestedScrollConnection) // <- connect scroll behavior
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
+
+                    item {
+                        TeamLazy(team = teamList)
+                    }
+
+
                     item {
                         SectionTitle(title = "Latest News")
                     }
@@ -197,9 +243,24 @@ fun HomePage() {
 }
 
 @Composable
-fun StoryLikePage (){
-    Row {  }
+fun TeamCard(team: teamItem){
+
+    Image(
+        painter = painterResource(id = team.imageRes),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(90.dp)
+            .padding(10.dp)
+            .border(
+                BorderStroke(3.dp, Color.Yellow),
+                CircleShape
+            )
+            .clip(CircleShape)
+
+    )
 }
+
 
 @Composable
 fun SectionTitle(title: String) {
@@ -274,7 +335,16 @@ fun NewsCard(news: NewsItem, onClick: () -> Unit) {
         }
     }
 }
-
+@Composable
+fun TeamLazy(team: List<teamItem>) {
+    LazyRow (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        items(team) {team -> TeamCard(team = team)}
+    }
+}
 
 @Composable
 fun HighlightCarousel(highlights: List<HighlightItem>) {
