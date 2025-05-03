@@ -23,10 +23,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat.Style
+import androidx.navigation.NavController
 
 
 @Composable
-fun Signup() {
+fun Signup(navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -93,7 +95,7 @@ fun Signup() {
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { /* Handle signup */ },
+            onClick = { /* Send to Database */ },
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF81D4FA),
@@ -106,9 +108,11 @@ fun Signup() {
         Spacer(modifier = Modifier.height(8.dp))
 
         TextButton(
-            onClick = { /* Navigate back to login */ }
+            onClick = { navController.navigate("Login") }
         ) {
-            Text(text = "Already have an account? Login")
+            Text(text = "Already have an account? Login",
+
+            )
         }
     }
 }

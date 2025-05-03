@@ -24,9 +24,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @Composable
-fun Login(){
+fun Login(navController: NavController){
 
     Column (
         modifier = Modifier.fillMaxSize(),
@@ -64,7 +65,8 @@ fun Login(){
         Spacer(modifier = Modifier.height(33.dp))
 
         Button(
-            onClick = {},
+            //NOT DONE COMEBACK
+            onClick = {navController.navigate("home")},
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor =  Color(0xFF81D4FA),

@@ -1,4 +1,7 @@
 package com.example.namhockey
 
-class CoachPage {
-}
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+
+@Composable
+fun Coach (navController: NavController) {}

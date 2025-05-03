@@ -3,6 +3,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -36,6 +37,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
 import com.example.namhockey.R
 import com.google.rpc.Help
 import kotlinx.coroutines.launch
@@ -46,8 +48,7 @@ data class teamItem( val imageRes: Int, val name: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomePage() {
-
+fun HomePage(navController: NavController) {
 
     val newsList = listOf(
         NewsItem(
@@ -106,7 +107,7 @@ fun HomePage() {
                         modifier = Modifier
                             .size(100.dp)
                             .border(
-                                BorderStroke(4.dp, Color.Blue),
+                                BorderStroke(4.dp, Color.Black),
                                 CircleShape
                             )
                             .padding(4.dp)
@@ -123,7 +124,7 @@ fun HomePage() {
                         label = { Text("Account") },
                         icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                         selected = false,
-                        onClick = {}
+                        onClick = { navController.navigate("account")}
                     )
 
                     HorizontalDivider()
@@ -132,17 +133,17 @@ fun HomePage() {
                     NavigationDrawerItem(
                         label = { Text("Find Club") },
                         selected = false,
-                        onClick = {/* handle click */}
+                        onClick = {navController.navigate("findClub")}
                     )
                     NavigationDrawerItem(
                         label = { Text("Register Club") },
                         selected = false,
-                        onClick = {/* handle click */}
+                        onClick = {navController.navigate("registerClub")}
                     )
                     NavigationDrawerItem(
                         label = { Text("Coach") },
                         selected = false,
-                        onClick = {/* handle click */}
+                        onClick = {navController.navigate("coach")}
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -169,11 +170,12 @@ fun HomePage() {
     {
         Scaffold(
             topBar = {
-                TopAppBar(
+                    TopAppBar(
                     title = {
                         Text(
                             text = "Nam Hockey Union",
                             fontSize = 20.sp,
+                            color = Color.Black,
                             fontWeight = FontWeight.Bold
                         )
                     },
@@ -198,18 +200,20 @@ fun HomePage() {
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.White,
+                        containerColor = Color.LightGray,
                         titleContentColor = Color.Black,
                         navigationIconContentColor = Color.Black
                     ),
                     scrollBehavior = scrollBehavior
                 )
+
             },
             content = { innerPadding ->
                 LazyColumn(
                     state = listState,
                     contentPadding = innerPadding,
                     modifier = Modifier
+                        .background(MaterialTheme.colorScheme.onSecondary)
                         .fillMaxSize()
                         .nestedScroll(scrollBehavior.nestedScrollConnection) // <- connect scroll behavior
                         .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -268,7 +272,7 @@ fun SectionTitle(title: String) {
         text = title,
         fontSize = 22.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF0288D1),
+        color = Color.Black,
         modifier = Modifier
             .padding(vertical = 12.dp)
     )
@@ -283,6 +287,7 @@ fun NewsCard(news: NewsItem, onClick: () -> Unit) {
 
     Card(
         shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(2.dp, color = Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
@@ -302,9 +307,6 @@ fun NewsCard(news: NewsItem, onClick: () -> Unit) {
             },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
         )
     ) {
         Column {
@@ -363,15 +365,13 @@ fun HighlightCarousel(highlights: List<HighlightItem>) {
 @Composable
 fun HighlightCard(highlight: HighlightItem) {
     Card(
+        border = BorderStroke(2.dp, color = Color.Black),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .width(180.dp)
             .padding(horizontal = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            containerColor = Color.Gray
         )
     ) {
         Column {
@@ -389,7 +389,7 @@ fun HighlightCard(highlight: HighlightItem) {
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(12.dp),
-                color = Color(0xFF0288D1)
+                color = Color.Black
             )
         }
     }

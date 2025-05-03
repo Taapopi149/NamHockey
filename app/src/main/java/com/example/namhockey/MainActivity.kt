@@ -1,6 +1,7 @@
 package com.example.namhockey
 
 import HomePage
+import android.accounts.Account
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,9 +21,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HomePage()
-           //Signup()
-            //Login()
+            AppNavigation()
+
         }
     }
 }

@@ -41,7 +41,8 @@ android {
 
 dependencies {
 
-    implementation(platform("androidx.compose:compose-bom:2025.02.00"))
+    implementation (libs.androidx.navigation.compose)
+    implementation(libs.compose.bom.v20250200)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
