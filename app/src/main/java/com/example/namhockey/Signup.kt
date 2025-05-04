@@ -1,4 +1,5 @@
 package com.example.namhockey
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat.Style
@@ -54,8 +57,10 @@ fun Signup(navController: NavController) {
             value = "",
             onValueChange = {},
             label = { Text(text = "Full Name") },
+            shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Blue
+                focusedBorderColor = Color.Black,
+                focusedLabelColor = Color.Black
             )
         )
 
@@ -65,8 +70,10 @@ fun Signup(navController: NavController) {
             value = "",
             onValueChange = {},
             label = { Text(text = "Email Address") },
+            shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Blue
+                focusedBorderColor = Color.Black,
+                focusedLabelColor = Color.Black
             )
         )
 
@@ -76,8 +83,11 @@ fun Signup(navController: NavController) {
             value = "",
             onValueChange = {},
             label = { Text(text = "Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Blue
+                focusedBorderColor = Color.Black,
+                focusedLabelColor = Color.Black
             )
         )
 
@@ -87,8 +97,11 @@ fun Signup(navController: NavController) {
             value = "",
             onValueChange = {},
             label = { Text(text = "Confirm Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Blue
+                focusedBorderColor = Color.Black,
+                focusedLabelColor = Color.Black
             )
         )
 
@@ -96,11 +109,13 @@ fun Signup(navController: NavController) {
 
         Button(
             onClick = { /* Send to Database */ },
-            shape = RoundedCornerShape(5.dp),
+            shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF81D4FA),
                 contentColor = Color.Black
-            )
+            ),
+            border = BorderStroke(1.dp, Color.Black),
+
         ) {
             Text(text = "Sign Up")
         }
@@ -110,8 +125,7 @@ fun Signup(navController: NavController) {
         TextButton(
             onClick = { navController.navigate("Login") }
         ) {
-            Text(text = "Already have an account? Login",
-
+            Text(text = "Already have an account? Login", color = Color.Black
             )
         }
     }

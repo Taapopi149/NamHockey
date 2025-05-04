@@ -19,6 +19,7 @@ val navController = rememberNavController()
         composable("findClub") { FindAClub(navController) }
         composable("registerClub") { RegisterTeam(navController) }
         composable("coach") { Coach(navController) }
+        composable("profile") { PlayerPageEdit(navController) }
 
     }
 }

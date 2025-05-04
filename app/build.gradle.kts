@@ -41,6 +41,8 @@ android {
 
 dependencies {
 
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-analytics")
     implementation (libs.androidx.navigation.compose)
     implementation(libs.compose.bom.v20250200)
     implementation(libs.androidx.core.ktx)
@@ -52,6 +54,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.protolite.well.known.types)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.animation.core.lint)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "631712073802",
+    "project_id": "nam-hockey-5ea5f",
+    "storage_bucket": "nam-hockey-5ea5f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:631712073802:android:8d01c432ce0ea1c62e3eb3",
+        "android_client_info": {
+          "package_name": "com.example.namhockey"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqaseelRO5cuzyKXwFJ7tmyBRgQw4V-Vc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

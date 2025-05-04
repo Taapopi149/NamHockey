@@ -1,5 +1,6 @@
 package com.example.namhockey
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,17 +48,21 @@ fun Login(navController: NavController){
         OutlinedTextField(value = "",
             onValueChange = {},
             label = {Text(text="Email address")},
+            shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Blue
+                focusedBorderColor = Color.Black,
+                focusedLabelColor = Color.Black
             )
         )
 
         Spacer(modifier = Modifier.height(5.dp))
         OutlinedTextField(value = "",
             onValueChange = {},
-            label = {Text(text="Email address")},
+            label = {Text(text="Password")},
+            shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Blue
+                focusedBorderColor = Color.Black,
+                focusedLabelColor = Color.Black
             )
 
             )
@@ -67,11 +72,12 @@ fun Login(navController: NavController){
         Button(
             //NOT DONE COMEBACK
             onClick = {navController.navigate("home")},
-            shape = RoundedCornerShape(5.dp),
+            shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor =  Color(0xFF81D4FA),
                 contentColor = Color.Black
-            )
+            ),
+            border = BorderStroke(1.dp, Color.Black)
         ) {
             Text(text = "Login")
         }
@@ -79,7 +85,7 @@ fun Login(navController: NavController){
         TextButton(onClick = {
 
         }) {
-            Text(text = "Forgot Password?")
+            Text(text = "Forgot Password?", color = Color.Black)
         }
 
     }

@@ -31,6 +31,7 @@ import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key.Companion.Window
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -124,7 +125,7 @@ fun HomePage(navController: NavController) {
                         label = { Text("Account") },
                         icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                         selected = false,
-                        onClick = { navController.navigate("account")}
+                        onClick = { navController.navigate("profile")}
                     )
 
                     HorizontalDivider()
@@ -171,6 +172,10 @@ fun HomePage(navController: NavController) {
         Scaffold(
             topBar = {
                     TopAppBar(
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                     title = {
                         Text(
                             text = "Nam Hockey Union",
@@ -199,11 +204,6 @@ fun HomePage(navController: NavController) {
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.LightGray,
-                        titleContentColor = Color.Black,
-                        navigationIconContentColor = Color.Black
-                    ),
                     scrollBehavior = scrollBehavior
                 )
 
@@ -248,6 +248,21 @@ fun HomePage(navController: NavController) {
 
 @Composable
 fun TeamCard(team: teamItem){
+    val rainbowColorsBrush = remember {
+        Brush.sweepGradient(
+            listOf(
+                Color(0xFF9575CD),
+                Color(0xFFBA68C8),
+                Color(0xFFE57373),
+                Color(0xFFFFB74D),
+                Color(0xFFFFF176),
+                Color(0xFFAED581),
+                Color(0xFF4DD0E1),
+                Color(0xFF9575CD)
+            )
+        )
+    }
+
 
     Image(
         painter = painterResource(id = team.imageRes),
@@ -257,7 +272,7 @@ fun TeamCard(team: teamItem){
             .size(90.dp)
             .padding(10.dp)
             .border(
-                BorderStroke(3.dp, Color.Black),
+                BorderStroke(3.dp, rainbowColorsBrush),
                 CircleShape
             )
             .clip(CircleShape)
@@ -371,7 +386,7 @@ fun HighlightCard(highlight: HighlightItem) {
             .width(180.dp)
             .padding(horizontal = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Gray
+            containerColor = Color(0xFF86B8E9)
         )
     ) {
         Column {
