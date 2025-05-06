@@ -30,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
@@ -39,35 +40,23 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.example.namhockey.NewsViewModel
 import com.example.namhockey.R
 import com.google.rpc.Help
 import kotlinx.coroutines.launch
+import coil.compose.AsyncImage
+import com.kwabenaberko.newsapilib.models.Article
 
-data class NewsItem(val title: String, val description: String, val imageRes: Int)
+
 data class HighlightItem(val imageRes: Int, val title: String)
 data class teamItem( val imageRes: Int, val name: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomePage(navController: NavController) {
+fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
 
-    val newsList = listOf(
-        NewsItem(
-            title = "Team A wins 4-2!",
-            description = "A thrilling match where Team A defeated Team B with an outstanding performance.",
-            imageRes = R.drawable.hockeysample
-        ),
-        NewsItem(
-            title = "Player X out with injury!",
-            description = "Star Player X suffered a minor injury and is expected to miss 2 weeks.",
-            imageRes = R.drawable.hockeysample
-        ),
-        NewsItem(
-            title = "Team C signs new star!",
-            description = "Team C has signed a top forward to boost their attack this season.",
-            imageRes = R.drawable.hockeysample
-        )
-    )
+    val articleList by newsViewModel.articles.observeAsState(emptyList())
+
 
     val teamList = listOf(
 
@@ -223,16 +212,6 @@ fun HomePage(navController: NavController) {
                         TeamLazy(team = teamList)
                     }
 
-
-                    item {
-                        SectionTitle(title = "Latest News")
-                    }
-                    items(newsList) { news ->
-                        NewsCard(news = news, onClick = {
-                            println("Clicked on ${news.title}")
-                        })
-                    }
-
                     item {
                         SectionTitle(title = "Game Highlights")
                     }
@@ -240,6 +219,18 @@ fun HomePage(navController: NavController) {
                     item {
                         HighlightCarousel(highlights = highlightList)
                     }
+
+                    item {
+                        SectionTitle(title = "Latest News")
+                    }
+                    items(articleList) { article ->
+                        NewsCard(article = article, onClick = {
+                            println("Clicked on ${article.title}")
+                            // Optionally navigate to detail screen
+                        })
+                    }
+
+
                 }
             }
         )
@@ -293,11 +284,9 @@ fun SectionTitle(title: String) {
     )
 }
 
-
 @Composable
-fun NewsCard(news: NewsItem, onClick: () -> Unit) {
+fun NewsCard(article: Article, onClick: () -> Unit) {
     var pressed by remember { mutableStateOf(false) }
-
     val scale by animateFloatAsState(targetValue = if (pressed) 0.97f else 1f, label = "scale")
 
     Card(
@@ -307,44 +296,40 @@ fun NewsCard(news: NewsItem, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(vertical = 10.dp)
             .graphicsLayer { scaleX = scale; scaleY = scale }
-            .clickable(
-                onClick = onClick,
-                onClickLabel = "Open news"
-            )
+            .clickable(onClick = onClick)
             .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        pressed = true
-                        tryAwaitRelease()
-                        pressed = false
-                    }
-                )
+                detectTapGestures(onPress = {
+                    pressed = true
+                    tryAwaitRelease()
+                    pressed = false
+                })
             },
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
-            Image(
-                painter = painterResource(id = news.imageRes),
-                contentDescription = "News Image",
-                contentScale = ContentScale.Crop
-                ,modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            )
+            article.urlToImage?.let { imageUrl ->
+                // Use an image loader like Coil
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "News Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                )
+            }
 
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = news.title,
+                    text = article.title ?: "No Title",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = news.description,
+                    text = article.description ?: "No Description",
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -352,6 +337,8 @@ fun NewsCard(news: NewsItem, onClick: () -> Unit) {
         }
     }
 }
+
+
 @Composable
 fun TeamLazy(team: List<teamItem>) {
     LazyRow (

@@ -40,7 +40,8 @@ android {
 }
 
 dependencies {
-
+    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation ("com.github.KwabenBerko:News-API-Java:1.0.2")
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation (libs.androidx.navigation.compose)
@@ -56,6 +57,7 @@ dependencies {
     implementation(libs.protolite.well.known.types)
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.animation.core.lint)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
