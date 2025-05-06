@@ -1,3 +1,4 @@
+import android.net.Uri
 import android.widget.Space
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -27,6 +28,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
@@ -223,10 +225,16 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
                     item {
                         SectionTitle(title = "Latest News")
                     }
+
                     items(articleList) { article ->
                         NewsCard(article = article, onClick = {
-                            println("Clicked on ${article.title}")
-                            // Optionally navigate to detail screen
+                            println("clicked on ${article.title}")
+                            val encodedTitle = Uri.encode(article.title ?: "No Title")
+                            val encodedDesc = Uri.encode(article.description ?: "No Description")
+                            val encodedImage = Uri.encode(article.urlToImage ?: "")
+
+                            navController.navigate("newsDetail/$encodedTitle/$encodedDesc/$encodedImage")
+
                         })
                     }
 
@@ -396,4 +404,55 @@ fun HighlightCard(highlight: HighlightItem) {
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NewsDetailScreen(title: String?, description: String?, imageUrl: String?) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Article Detail") },
+                navigationIcon = {
+                    Icon(Icons.Default.ArrowBack, contentDescription = null)
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+        ) {
+            imageUrl?.let {
+                AsyncImage(
+                    model = it,
+                    contentDescription = "Article Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = title ?: "No Title",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = description ?: "No Description",
+                fontSize = 16.sp
+            )
+        }
+    }
+}
+
+
 
