@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Nam Hockey</string>
+    <string name="default_web_client_id" >631712073802-0c54qa7qmqdhsstipqoebriqtlpmt99u.apps.googleusercontent.com</string>
 </resources>

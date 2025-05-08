@@ -12,7 +12,20 @@
           "package_name": "com.example.namhockey"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "631712073802-dahecj7fihjfevhljj804ralef6l9dg1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.namhockey",
+            "certificate_hash": "657b3f752f69b382444397b080bdca42c2226585"
+          }
+        },
+        {
+          "client_id": "631712073802-0c54qa7qmqdhsstipqoebriqtlpmt99u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCqaseelRO5cuzyKXwFJ7tmyBRgQw4V-Vc"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "631712073802-0c54qa7qmqdhsstipqoebriqtlpmt99u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

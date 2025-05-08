@@ -13,13 +13,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 
 @Composable
-fun AppNavigation(newsViewModel: NewsViewModel, youTubeViewModel: YouTubeViewModel ) {
+fun AppNavigation(newsViewModel: NewsViewModel, youTubeViewModel: YouTubeViewModel, loginViewModel: LoginViewModel) {
 
 val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "SignUp") {
         composable("SignUp") { Signup(navController) }
-        composable("Login") { Login(navController) }
+        composable("Login") { Login(navController, loginViewModel) }
         composable("home") { HomePage(navController, newsViewModel,youTubeViewModel)  }
         composable("account") { Accountpage(navController) }
         composable("findClub") { FindAClub(navController) }
