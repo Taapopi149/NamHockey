@@ -1,6 +1,5 @@
+import android.content.Intent
 import android.net.Uri
-import android.widget.Space
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -22,7 +21,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -36,28 +34,45 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.key.Key.Companion.Window
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.namhockey.NewsViewModel
 import com.example.namhockey.R
-import com.google.rpc.Help
 import kotlinx.coroutines.launch
 import coil.compose.AsyncImage
 import com.kwabenaberko.newsapilib.models.Article
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.namhockey.Constant
+import com.example.namhockey.Snippet
+import com.example.namhockey.YouTubeViewModel
 
 
-data class HighlightItem(val imageRes: Int, val title: String)
 data class teamItem( val imageRes: Int, val name: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
+fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
+             youTubeViewModel: YouTubeViewModel
+             ) {
 
     val articleList by newsViewModel.articles.observeAsState(emptyList())
+
+
+    val videoIds = listOf("N0EmKOquFYk", "Zxmq99kcqe0", "p_ZXFLMCmK4" , "RNxK3byDMuk", "swDpcEH-CnI")
+    val viewModel: YouTubeViewModel = viewModel()
+    val snippets = viewModel.videoData
+
+    var isLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        isLoading = true
+        viewModel.loadVideos(videoIds, apiKey = Constant.youtube)
+        isLoading = false
+    }
+
 
 
     val teamList = listOf(
@@ -68,13 +83,11 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
         teamItem(R.drawable.team4, "DTS Hockey Club")
     )
 
-    val highlightList = listOf(
-        HighlightItem(R.drawable.hockeysample, "Epic Shootout!"),
-        HighlightItem(R.drawable.hockeysample, "Insane Save!"),
-        HighlightItem(R.drawable.hockeysample, "Buzzer Beater Goal!")
-    )
+    LaunchedEffect(Unit) {
+        viewModel.loadVideos(videoIds, apiKey = Constant.youtube)
+    }
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior() // <- scroll behavior
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val listState = rememberLazyListState()
 
@@ -195,6 +208,17 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
                             )
                         }
                     },
+
+                    actions = {
+                        IconButton(onClick = { navController.navigate("fixtures") }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.fixtureicon),
+                                contentDescription = "Fixtures",
+                                tint = Color.Black,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    },
                     scrollBehavior = scrollBehavior
                 )
 
@@ -206,7 +230,7 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondary)
                         .fillMaxSize()
-                        .nestedScroll(scrollBehavior.nestedScrollConnection) // <- connect scroll behavior
+                        .nestedScroll(scrollBehavior.nestedScrollConnection)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
 
@@ -219,8 +243,9 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
                     }
 
                     item {
-                        HighlightCarousel(highlights = highlightList)
+                        HighlightCarousel(videoIds = videoIds, snippets = snippets, isLoading = isLoading)
                     }
+
 
                     item {
                         SectionTitle(title = "Latest News")
@@ -228,7 +253,7 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
 
                     items(articleList) { article ->
                         NewsCard(article = article, onClick = {
-                            println("clicked on ${article.title}")
+
                             val encodedTitle = Uri.encode(article.title ?: "No Title")
                             val encodedDesc = Uri.encode(article.description ?: "No Description")
                             val encodedImage = Uri.encode(article.urlToImage ?: "")
@@ -247,6 +272,7 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel) {
 
 @Composable
 fun TeamCard(team: teamItem){
+
     val rainbowColorsBrush = remember {
         Brush.sweepGradient(
             listOf(
@@ -271,7 +297,7 @@ fun TeamCard(team: teamItem){
             .size(90.dp)
             .padding(10.dp)
             .border(
-                BorderStroke(3.dp, rainbowColorsBrush),
+                BorderStroke(3.dp, color = Color.Black),
                 CircleShape
             )
             .clip(CircleShape)
@@ -316,7 +342,7 @@ fun NewsCard(article: Article, onClick: () -> Unit) {
     ) {
         Column {
             article.urlToImage?.let { imageUrl ->
-                // Use an image loader like Coil
+
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = "News Image",
@@ -358,63 +384,97 @@ fun TeamLazy(team: List<teamItem>) {
     }
 }
 
+
 @Composable
-fun HighlightCarousel(highlights: List<HighlightItem>) {
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        items(highlights) { highlight ->
-            HighlightCard(highlight)
+fun HighlightCarousel(
+    videoIds: List<String>,
+    snippets: Map<String, Snippet>,
+    isLoading: Boolean
+) {
+    when {
+        isLoading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        snippets.isEmpty() -> {
+            Text(
+                text = "No highlights available at the moment.",
+                modifier = Modifier.padding(16.dp),
+                color = Color.Gray
+            )
+        }
+
+        else -> {
+            LazyRow {
+                items(videoIds) { id ->
+                    snippets[id]?.let {
+                        HighlightCard(videoId = id, snippet = it)
+                    }
+                }
+            }
         }
     }
 }
 
 
 @Composable
-fun HighlightCard(highlight: HighlightItem) {
+fun HighlightCard(videoId: String, snippet: Snippet) {
+    val context = LocalContext.current
+    val videoUrl = "https://www.youtube.com/watch?v=$videoId"
+
     Card(
-        border = BorderStroke(2.dp, color = Color.Black),
-        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .width(180.dp)
-            .padding(horizontal = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF86B8E9)
-        )
+            .padding(8.dp)
+            .clickable {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(videoUrl)
+                intent.setPackage("com.google.android.youtube")
+
+            },
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(2.dp, Color.Black),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
-            Image(
-                painter = painterResource(id = highlight.imageRes),
-                contentDescription = "Highlight Image",
+            AsyncImage(
+                model = snippet.thumbnails.medium.url,
+                contentDescription = "YouTube Thumbnail",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(110.dp)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                contentScale = ContentScale.Crop
             )
 
             Text(
-                text = highlight.title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(12.dp),
-                color = Color.Black
+                text = snippet.title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(12.dp)
             )
         }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewsDetailScreen(title: String?, description: String?, imageUrl: String?) {
+fun NewsDetailScreen(title: String?, description: String?, imageUrl: String?, navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Article Detail") },
                 navigationIcon = {
-                    Icon(Icons.Default.ArrowBack, contentDescription = null)
-                }
+                    IconButton(onClick = { navController.popBackStack() })  { Icon(Icons.Default.ArrowBack, contentDescription = null)
+                }}
             )
         }
     ) { padding ->

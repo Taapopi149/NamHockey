@@ -13,19 +13,20 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 
 @Composable
-fun AppNavigation(newsViewModel: NewsViewModel ) {
+fun AppNavigation(newsViewModel: NewsViewModel, youTubeViewModel: YouTubeViewModel ) {
 
 val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "SignUp") {
         composable("SignUp") { Signup(navController) }
         composable("Login") { Login(navController) }
-        composable("home") { HomePage(navController, newsViewModel)  }
+        composable("home") { HomePage(navController, newsViewModel,youTubeViewModel)  }
         composable("account") { Accountpage(navController) }
         composable("findClub") { FindAClub(navController) }
         composable("registerClub") { RegisterTeam(navController) }
         composable("coach") { Coach(navController) }
         composable("profile") { PlayerPageEdit(navController) }
+        composable("fixtures") {FixturesAndScores(navController)}
 
         composable(route = "newsDetail/{title}/{description}/{imageUrl}",
                 arguments = listOf(
@@ -38,7 +39,7 @@ val navController = rememberNavController()
             val description = backStackEntry.arguments?.getString("description")?.let { Uri.decode(it) }
             val imageUrl = backStackEntry.arguments?.getString("imageUrl")?.let { Uri.decode(it) }
 
-            NewsDetailScreen(title, description, imageUrl)
+            NewsDetailScreen(title?: "No title", description?: "No description ", imageUrl?:" ", navController)
 
         }
 

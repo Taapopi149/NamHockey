@@ -40,6 +40,10 @@ android {
 }
 
 dependencies {
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation ("com.github.KwabenBerko:News-API-Java:1.0.2")
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))

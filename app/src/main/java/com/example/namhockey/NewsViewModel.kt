@@ -14,13 +14,13 @@ class NewsViewModel: ViewModel() {
 private val _articles = MutableLiveData<List<Article>>()
 val articles: LiveData<List<Article>> = _articles
 
-
 init {
    fetchNewEverything()
 }
 
 
     fun fetchNewEverything() {
+
         val newsApiClient = NewsApiClient(Constant.apiKey)
 
         val request = EverythingRequest.Builder().language("en").q("Hockey").build()
@@ -40,7 +40,5 @@ init {
 
         })
     }
-
-
 
 }
