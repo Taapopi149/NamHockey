@@ -238,8 +238,10 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
                         TeamLazy(team = teamList)
                     }
 
+
                     item {
                         SectionTitle(title = "Game Highlights")
+                        HorizontalDivider()
                     }
 
                     item {
@@ -248,8 +250,10 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
 
 
                     item {
+                        HorizontalDivider()
                         SectionTitle(title = "Latest News")
                     }
+
 
                     items(articleList) { article ->
                         NewsCard(article = article, onClick = {
@@ -261,6 +265,8 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
                             navController.navigate("newsDetail/$encodedTitle/$encodedDesc/$encodedImage")
 
                         })
+                        HorizontalDivider()
+
                     }
 
 
