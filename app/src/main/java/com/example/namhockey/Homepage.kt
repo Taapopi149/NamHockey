@@ -212,7 +212,7 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
                     actions = {
                         IconButton(onClick = { navController.navigate("fixtures") }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.fixtureicon),
+                                painter = painterResource(id = R.drawable.bell),
                                 contentDescription = "Fixtures",
                                 tint = Color.Black,
                                 modifier = Modifier.size(28.dp)
