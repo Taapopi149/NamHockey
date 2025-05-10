@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
@@ -44,7 +45,9 @@ import kotlinx.coroutines.launch
 import coil.compose.AsyncImage
 import com.kwabenaberko.newsapilib.models.Article
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.namhockey.Constant
 import com.example.namhockey.Snippet
 import com.example.namhockey.YouTubeViewModel
@@ -57,6 +60,12 @@ data class teamItem( val imageRes: Int, val name: String)
 fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
              youTubeViewModel: YouTubeViewModel
              ) {
+
+    var searchQuery by remember { mutableStateOf("") }
+
+//    val filterdTeams = teamList.filter {
+//        it.name.contains(searchQuery, ingoreCase - true)
+//    }
 
     val articleList by newsViewModel.articles.observeAsState(emptyList())
 
@@ -235,9 +244,30 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
                 ) {
 
                     item {
-                        TeamLazy(team = teamList)
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            shape = RoundedCornerShape(25.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                            ),
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            singleLine = true
+                        )
                     }
 
+              item {
+                  SectionTitle("Most Searched Team")
+              }
+
+                    item {
+                        TeamLazy(team = teamList)
+                    }
 
                     item {
                         SectionTitle(title = "Game Highlights")
@@ -254,22 +284,10 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
                         SectionTitle(title = "Latest News")
                     }
 
-
                     items(articleList) { article ->
-                        NewsCard(article = article, onClick = {
-
-                            val encodedTitle = Uri.encode(article.title ?: "No Title")
-                            val encodedDesc = Uri.encode(article.description ?: "No Description")
-                            val encodedImage = Uri.encode(article.urlToImage ?: "")
-
-                            navController.navigate("newsDetail/$encodedTitle/$encodedDesc/$encodedImage")
-
-                        })
+                        NewsCard(article = article, navController = navController)
                         HorizontalDivider()
-
                     }
-
-
                 }
             }
         )
@@ -303,7 +321,7 @@ fun TeamCard(team: teamItem){
             .size(90.dp)
             .padding(10.dp)
             .border(
-                BorderStroke(3.dp, color = Color.Black),
+                BorderStroke(3.dp,rainbowColorsBrush),
                 CircleShape
             )
             .clip(CircleShape)
@@ -325,18 +343,25 @@ fun SectionTitle(title: String) {
 }
 
 @Composable
-fun NewsCard(article: Article, onClick: () -> Unit) {
+fun NewsCard(article: Article, navController: NavController) {
     var pressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(targetValue = if (pressed) 0.97f else 1f, label = "scale")
 
     Card(
         shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(2.dp, color = Color.Black),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
             .graphicsLayer { scaleX = scale; scaleY = scale }
-            .clickable(onClick = onClick)
+            .clickable {
+                val encodedTitle = Uri.encode(article.title ?: "No Title")
+                val encodedDescription = Uri.encode(article.description ?: "No Description")
+                val encodedImageUrl = Uri.encode(article.urlToImage ?: "")
+
+                navController.navigate("newsDetail/$encodedTitle/$encodedDescription/$encodedImageUrl")
+            }
             .pointerInput(Unit) {
                 detectTapGestures(onPress = {
                     pressed = true
@@ -344,11 +369,9 @@ fun NewsCard(article: Article, onClick: () -> Unit) {
                     pressed = false
                 })
             },
-        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             article.urlToImage?.let { imageUrl ->
-
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = "News Image",
@@ -377,6 +400,7 @@ fun NewsCard(article: Article, onClick: () -> Unit) {
         }
     }
 }
+
 
 
 @Composable
@@ -440,14 +464,19 @@ fun HighlightCard(videoId: String, snippet: Snippet) {
             .width(180.dp)
             .padding(8.dp)
             .clickable {
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.data = Uri.parse(videoUrl)
-                intent.setPackage("com.google.android.youtube")
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(videoUrl)
+                setPackage("com.google.android.youtube")
+
+            }
+                context.startActivity(intent)
 
             },
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(2.dp, Color.Black),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = MaterialTheme.shapes.medium,
+        //shape = RoundedCornerShape(16.dp),
+
     ) {
         Column {
             AsyncImage(
@@ -469,56 +498,5 @@ fun HighlightCard(videoId: String, snippet: Snippet) {
         }
     }
 }
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun NewsDetailScreen(title: String?, description: String?, imageUrl: String?, navController: NavController) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Article Detail") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() })  { Icon(Icons.Default.ArrowBack, contentDescription = null)
-                }}
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            imageUrl?.let {
-                AsyncImage(
-                    model = it,
-                    contentDescription = "Article Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = title ?: "No Title",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = description ?: "No Description",
-                fontSize = 16.sp
-            )
-        }
-    }
-}
-
 
 

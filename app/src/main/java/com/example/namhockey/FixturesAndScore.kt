@@ -50,69 +50,146 @@ fun FixturesAndScores(navController: NavController) {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                elevation = CardDefaults.cardElevation(4.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Namibia 3 - 2 South Africa", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                    Text("Final", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
+            LiveMatchCard("TeamA", 3 ,"TeamB", 4 , "78", "")
+            LiveMatchCard("TeamC", 3 ,"TeamD", 4 , "23", "")
+            LiveMatchCard("TeamF", 3 ,"TeamD", 4 , "34", "")
 
-
+            Spacer(Modifier.height(10.dp))
             HorizontalDivider()
-
+            Spacer(Modifier.height(10.dp))
             Text("Upcoming Fixtures", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
+
             // Add your fixture list here
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                elevation = CardDefaults.cardElevation(2.dp)
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text("Namibia vs Zambia", fontWeight = FontWeight.SemiBold)
-                    Text("Date: 12 May 2025 | Time: 16:00", fontSize = 14.sp, color = Color.Gray)
+            val upcomingFixtures = listOf(
+                "Namibia vs Zambia" to "12 May 2025 | 16:00",
+                "South Africa vs Kenya" to "14 May 2025 | 18:00"
+            )
+
+            upcomingFixtures.forEach { (match, details) ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(match, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(details, fontSize = 14.sp, color = Color.Gray)
+                    }
                 }
             }
 
 
+            Spacer(Modifier.height(10.dp))
             HorizontalDivider()
 
-
+            Spacer(Modifier.height(10.dp))
             Text("Group Tables", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
-            // Add your group table UI here
 
-            Column {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Team", fontWeight = FontWeight.Bold)
-                    Text("P", fontWeight = FontWeight.Bold)
-                    Text("W", fontWeight = FontWeight.Bold)
-                    Text("L", fontWeight = FontWeight.Bold)
-                    Text("Pts", fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                listOf(
-                    listOf("Namibia", "3", "2", "1", "6"),
-                    listOf("South Africa", "3", "2", "1", "6"),
-                    listOf("Zambia", "3", "1", "2", "3")
-                ).forEach { row ->
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        row.forEach { cell ->
-                            Text(cell)
+            val headers = listOf("Team", "M", "W", "D", "L", "G", "Pts")
+            val groupData = listOf(
+                listOf("Bayern Munich", "3", "3", "0", "0", "9:5", "9"),
+                listOf("Galatasaray", "3", "1", "1", "1", "6:7", "4"),
+                listOf("FC Copenhagen", "2", "0", "1", "1", "3:4", "1"),
+                listOf("Manchester United", "2", "0", "0", "2", "5:7", "0")
+            )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF0D1B2A)), // dark navy
+                elevation = CardDefaults.cardElevation(4.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    // Header Row
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        headers.forEach {
+                            Text(
+                                text = it,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = Color.White,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+
+                    // Data Rows
+                    groupData.forEachIndexed { index, row ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            row.forEach {
+                                Text(
+                                    text = it,
+                                    fontSize = 12.sp,
+                                    color = Color.LightGray,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+
+                        if (index < groupData.lastIndex) {
+                            Divider(color = Color.Gray.copy(alpha = 0.3f), thickness = 0.5.dp)
                         }
                     }
                 }
             }
 
 
+        }
+    }
+}
+
+
+@Composable
+fun LiveMatchCard(teamA: String, scoreA: Int, teamB: String, scoreB: Int, minute: String, scorer: String? = null) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("LIVE $minute", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                scorer?.let {
+                    Text(it, fontSize = 12.sp, color = Color.DarkGray)
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(teamA, fontWeight = FontWeight.SemiBold)
+                }
+                Text("$scoreA - $scoreB", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Column {
+                    Text(teamB, fontWeight = FontWeight.SemiBold)
+                }
+            }
         }
     }
 }

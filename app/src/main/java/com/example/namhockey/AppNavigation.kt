@@ -1,16 +1,13 @@
 package com.example.namhockey
 
 import HomePage
-import NewsDetailScreen
-import android.accounts.Account
-import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+
 
 @Composable
 fun AppNavigation(newsViewModel: NewsViewModel, youTubeViewModel: YouTubeViewModel, loginViewModel: LoginViewModel) {
@@ -28,20 +25,31 @@ val navController = rememberNavController()
         composable("profile") { PlayerPageEdit(navController) }
         composable("fixtures") {FixturesAndScores(navController)}
 
-        composable(route = "newsDetail/{title}/{description}/{imageUrl}",
-                arguments = listOf(
-                    navArgument("title") { type = NavType.StringType },
-                    navArgument("description") { type = NavType.StringType },
-                    navArgument("imageUrl") { type = NavType.StringType }
-                )
-            ) {backStackEntry ->
-            val title = backStackEntry.arguments?.getString("title")?.let { Uri.decode(it) }
-            val description = backStackEntry.arguments?.getString("description")?.let { Uri.decode(it) }
-            val imageUrl = backStackEntry.arguments?.getString("imageUrl")?.let { Uri.decode(it) }
+        composable("newsDetail/{title}/{description}/{imageUrl}",
 
-            NewsDetailScreen(title?: "No title", description?: "No description ", imageUrl?:" ", navController)
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType },
+                navArgument("description") { type = NavType.StringType },
+                navArgument("imageUrl") { type = NavType.StringType }
+            )
 
+        ) { backStackEntry ->
+
+            val title = backStackEntry.arguments?.getString("title")
+            val description = backStackEntry.arguments?.getString("description")
+            val imageUrl = backStackEntry.arguments?.getString("imageUrl")
+
+
+            NewsDetailScreen(
+                title = title,
+                description = description,
+                imageUrl = imageUrl,
+                navController = navController
+            )
         }
+
+
+
 
     }
 }
