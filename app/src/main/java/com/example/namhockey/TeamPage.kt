@@ -1,4 +1,10 @@
 package com.example.namhockey
 
-class TeamPage {
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+
+@Composable
+fun TeamPage(navController: NavController)
+{
+
 }

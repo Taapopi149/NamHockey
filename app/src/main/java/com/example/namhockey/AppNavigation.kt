@@ -24,7 +24,8 @@ val navController = rememberNavController()
         composable("coach") { Coach(navController) }
         composable("profile") { PlayerPageEdit(navController) }
         composable("fixtures") {FixturesAndScores(navController)}
-
+        composable("TeamPage") { TeamPage(navController) }
+        composable("TeamManagement") { TeamManagement(navController) }
         composable("newsDetail/{title}/{description}/{imageUrl}",
 
             arguments = listOf(

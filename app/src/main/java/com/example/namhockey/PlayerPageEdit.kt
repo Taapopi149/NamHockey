@@ -3,10 +3,12 @@ package com.example.namhockey
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,107 +47,150 @@ fun PlayerPageEdit(navController: NavController) {
                 }
             )
         }
-    ) {padding ->
-    Column(
-        modifier = Modifier
-            .padding(padding)
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-
-        Spacer(Modifier.height(45.dp))
-
-        // Player Header
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.propic),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, Color.Gray, CircleShape),
-                contentScale = ContentScale.Crop
+            // Profile Section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.propic),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, Color.LightGray, CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StatColumn("12", "Posts")
+                    StatColumn("1.2K", "Followers")
+                    StatColumn("320", "Following")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text("Connor McDavid", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text("Center", fontSize = 14.sp, color = Color.Gray)
+            Text(
+                text = "Fastest skater in the league. MVP 2021. Loves sushi and video games.",
+                fontSize = 14.sp,
+                color = Color.DarkGray,
+                modifier = Modifier.padding(vertical = 4.dp)
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text("Connor McDavid", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                Text("Center", fontSize = 16.sp, color = Color.Gray)
-            }
-        }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-
-        // Player Bio
-        Text(
-            text = "Fastest skater in the league. MVP 2021. Loves sushi and video games.",
-            fontSize = 14.sp,
-            color = Color.DarkGray,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Row (
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Button(onClick = {
-                navController.navigate("account")
-            },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor =  Color(0xFF81D4FA),
-                    contentColor = Color.Black
-                ),
-                border = BorderStroke(1.dp, Color.Black)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "Edit"
-                )
+                OutlinedButton(
+                    onClick = { navController.navigate("account") },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Edit Profile")
+                }
+                OutlinedButton(
+                    onClick = {},
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Add Post")
+                }
             }
 
-            Button(onClick = {},
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor =  Color(0xFF81D4FA),
-                    contentColor = Color.Black
-                ),
-                border = BorderStroke(1.dp, Color.Black)
+            Spacer(modifier = Modifier.height(4.dp))
 
-            ) {
-                Text(
-                    text = "Add Post"
-                )
-            }
+            // Highlights
+            Text(
+                text = "Played For:",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+            Highlights()
+
+            Spacer(modifier = Modifier.height(12.dp))
+            Divider()
+
+            // Posts Grid
+            Text(
+                text = "Posts",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            PostGrid(imageList)
         }
-
-        // Highlight Section
-        Text(
-            text = "Played For:",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Highlights()
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        HorizontalDivider()
-        // Posts Section
-        Text(
-            text = "Posts",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        PostGrid(imageList)
     }
 }
+
+@Composable
+fun StatColumn(number: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = number, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(text = label, color = Color.Gray, fontSize = 14.sp)
+    }
+}
+
+@Composable
+fun Highlights() {
+    val highlights = listOf(
+        "Oilers" to R.drawable.teama,
+        "Leafs" to R.drawable.team3,
+        "Flames" to R.drawable.team4
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        highlights.forEach { (team, imageRes) ->
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    shape = CircleShape,
+                    elevation = CardDefaults.cardElevation(2.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    modifier = Modifier.size(70.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = imageRes),
+                        contentDescription = "$team Logo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp)
+                            .clip(CircleShape)
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = team,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -153,10 +198,11 @@ fun PostGrid(imageList: List<Int>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = Modifier
-            .fillMaxWidth(),
-        contentPadding = PaddingValues(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+            .fillMaxSize()
+            .padding(top = 4.dp),
+        contentPadding = PaddingValues(2.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         items(imageList) { imageRes ->
             Image(
@@ -165,13 +211,8 @@ fun PostGrid(imageList: List<Int>) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(4.dp))
             )
         }
     }
-}
-
-@Composable
-fun Highlights() {
-
 }
