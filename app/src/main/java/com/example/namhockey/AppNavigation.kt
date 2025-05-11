@@ -1,6 +1,7 @@
 package com.example.namhockey
 
 import HomePage
+import TeamPage
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,6 +27,7 @@ val navController = rememberNavController()
         composable("fixtures") {FixturesAndScores(navController)}
         composable("TeamPage") { TeamPage(navController) }
         composable("TeamManagement") { TeamManagement(navController) }
+        composable("PlayerReg"){ PlayerRegister(navController) }
         composable("newsDetail/{title}/{description}/{imageUrl}",
 
             arguments = listOf(

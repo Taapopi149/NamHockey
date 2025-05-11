@@ -70,14 +70,6 @@ fun PlayerPageEdit(navController: NavController) {
                     contentScale = ContentScale.Crop
                 )
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    StatColumn("12", "Posts")
-                    StatColumn("1.2K", "Followers")
-                    StatColumn("320", "Following")
-                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

@@ -42,6 +42,9 @@ android {
 }
 
 dependencies {
+
+    implementation ("com.google.accompanist:accompanist-flowlayout:0.24.3-alpha")
+
     // Firebase & Auth
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
@@ -70,6 +73,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.media3.common.ktx)
 
     // Testing
     testImplementation(libs.junit)

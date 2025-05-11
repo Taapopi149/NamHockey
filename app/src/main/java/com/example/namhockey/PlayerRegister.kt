@@ -1,5 +1,6 @@
 package com.example.namhockey
 
+import Player
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -8,14 +9,33 @@ import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +50,7 @@ import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterTeam(navController: NavController) {
+fun PlayerRegister(navController: NavController) {
     val context = LocalContext.current
 
     var teamName by remember { mutableStateOf("") }
@@ -47,7 +67,7 @@ fun RegisterTeam(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Register Team") },
+                title = { Text("Register Player") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -63,7 +83,7 @@ fun RegisterTeam(navController: NavController) {
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Team Registration", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text("Player Registration", fontSize = 22.sp, fontWeight = FontWeight.Bold)
 
             // Image Picker Preview
             Box(
@@ -78,21 +98,21 @@ fun RegisterTeam(navController: NavController) {
                 if (logoUri != null) {
                     Image(
                         painter = rememberAsyncImagePainter(logoUri),
-                        contentDescription = "Selected Team Logo",
+                        contentDescription = "Profile ",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(16.dp))
                     )
                 } else {
-                    Text("Tap to select Team Logo", color = Color.Gray)
+                    Text("Tap to select Picture", color = Color.Gray)
                 }
             }
 
             OutlinedTextField(
                 value = teamName,
                 onValueChange = { teamName = it },
-                label = { Text("Team Name") },
+                label = { Text("First Name(s)") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp)
@@ -101,7 +121,7 @@ fun RegisterTeam(navController: NavController) {
             OutlinedTextField(
                 value = managerName,
                 onValueChange = { managerName = it },
-                label = { Text("Manager Name") },
+                label = { Text("Last Name") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp)
@@ -110,7 +130,7 @@ fun RegisterTeam(navController: NavController) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Manager Email") },
+                label = { Text("Email") },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
@@ -130,7 +150,7 @@ fun RegisterTeam(navController: NavController) {
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Team Description") },
+                label = { Text("Motivation") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
@@ -142,7 +162,7 @@ fun RegisterTeam(navController: NavController) {
             Button(
                 onClick = {
                     if (teamName.isNotBlank() && managerName.isNotBlank() && email.isNotBlank() && phone.isNotBlank()) {
-                        Toast.makeText(context, "Team Registered Successfully!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Registered Successfully!", Toast.LENGTH_LONG).show()
                         navController.popBackStack()
                     } else {
                         Toast.makeText(context, "Please fill in all required fields.", Toast.LENGTH_SHORT).show()
@@ -159,5 +179,3 @@ fun RegisterTeam(navController: NavController) {
         }
     }
 }
-
-

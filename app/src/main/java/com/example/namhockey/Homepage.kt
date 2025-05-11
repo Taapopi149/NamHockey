@@ -86,7 +86,7 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
 
     val teamList = listOf(
 
-        teamItem(R.drawable.teama, "My Team" ),
+        teamItem(R.drawable.saintsr, "My Team" ),
         teamItem(R.drawable.team3, "The School of excellence hockey Club"),
         teamItem(R.drawable.team5, "Windhoek Old Boys"),
         teamItem(R.drawable.team4, "DTS Hockey Club")
@@ -266,7 +266,7 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
               }
 
                     item {
-                        TeamLazy(team = teamList)
+                        TeamLazy(team = teamList, navController = navController)
                     }
 
                     item {
@@ -295,8 +295,7 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
 }
 
 @Composable
-fun TeamCard(team: teamItem){
-
+fun TeamCard(team: teamItem, onClick: () -> Unit) {
     val rainbowColorsBrush = remember {
         Brush.sweepGradient(
             listOf(
@@ -312,21 +311,31 @@ fun TeamCard(team: teamItem){
         )
     }
 
-
-    Image(
-        painter = painterResource(id = team.imageRes),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .size(90.dp)
-            .padding(10.dp)
-            .border(
-                BorderStroke(3.dp,rainbowColorsBrush),
-                CircleShape
-            )
-            .clip(CircleShape)
+            .padding(8.dp)
+            .clickable { onClick() }  // Make entire card clickable
+    ) {
+        Image(
+            painter = painterResource(id = team.imageRes),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(90.dp)
+                .border(BorderStroke(3.dp, rainbowColorsBrush), CircleShape)
+                .padding(4.dp)
+                .clip(CircleShape)
+        )
 
-    )
+        Text(
+            text = team.name,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(top = 4.dp),
+            maxLines = 1
+        )
+    }
 }
 
 
@@ -404,15 +413,22 @@ fun NewsCard(article: Article, navController: NavController) {
 
 
 @Composable
-fun TeamLazy(team: List<teamItem>) {
-    LazyRow (
+fun TeamLazy(team: List<teamItem>, navController: NavController) {
+    LazyRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
-        items(team) {team -> TeamCard(team = team)}
+        items(team) { teamItem ->
+            TeamCard(team = teamItem) {
+                // Example: Navigate to team page with name as argument
+                val encodedName = Uri.encode(teamItem.name)
+                navController.navigate("TeamPage")
+            }
+        }
     }
 }
+
 
 
 @Composable
