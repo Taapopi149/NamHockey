@@ -10,6 +10,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,8 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
+data class Event(
+    val day: String,
+    val month: String,
+    val title: String,
+    val location: String,
+    val time: String
+)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,6 +55,18 @@ fun FixturesAndScores(navController: NavController) {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+
+            val upcomingEvents = listOf(
+                Event("24", "JUN", "National Championship", "Windhoek Stadium", "09:00 AM"),
+                Event("30", "JUN", "Junior Tournament", "Sports Complex", "10:30 AM")
+            )
+
+            UpcomingEventsSection(events = upcomingEvents)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+
             Text(
                 text = "Live Score",
                 fontSize = 18.sp,
@@ -157,6 +181,44 @@ fun FixturesAndScores(navController: NavController) {
     }
 }
 
+@Composable
+fun UpcomingEventsSection(events: List<Event>) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Upcoming Events", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            TextButton(onClick = { /* handle view all */ }) {
+                Text("View All")
+            }
+        }
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(vertical = 8.dp)
+        ) {
+            items(events) { event ->
+                Card(
+                    modifier = Modifier.width(200.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text("${event.day} ${event.month}", fontWeight = FontWeight.Bold, color = Color.Blue)
+                        Text(event.title, fontWeight = FontWeight.Bold)
+                        Text(event.location, fontSize = 12.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(event.time, color = Color.Blue, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun LiveMatchCard(teamA: String, scoreA: Int, teamB: String, scoreB: Int, minute: String, scorer: String? = null) {
@@ -192,4 +254,11 @@ fun LiveMatchCard(teamA: String, scoreA: Int, teamB: String, scoreB: Int, minute
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FixturesAndScoresPreview() {
+    val navController = rememberNavController()
+    FixturesAndScores(navController = navController)
 }
