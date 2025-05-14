@@ -1,8 +1,14 @@
+//val room_version = "2.6.1"
+
+
 plugins {
+
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+//    id("com.google.devtools.ksp")
+
 }
 
 android {
@@ -42,6 +48,12 @@ android {
 }
 
 dependencies {
+
+    //Room
+//    implementation("androidx.room:room-runtime:$room_version")
+//    ksp("androidx.room:room-compiler:$room_version")
+//    implementation("androidx.room:room-ktx:$room_version")
+
 
     implementation ("com.google.accompanist:accompanist-flowlayout:0.24.3-alpha")
 
