@@ -61,7 +61,7 @@ fun PlayerPageEdit(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.propic),
+                    painter = painterResource(id = R.drawable.profilepic),
                     contentDescription = "Profile Picture",
                     modifier = Modifier
                         .size(90.dp)
@@ -74,7 +74,7 @@ fun PlayerPageEdit(navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text("Connor McDavid", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text("Taapopi Ndeshipanda", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Text("Center", fontSize = 14.sp, color = Color.Gray)
             Text(
                 text = "Fastest skater in the league. MVP 2021. Loves sushi and video games.",

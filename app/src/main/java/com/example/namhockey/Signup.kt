@@ -1,60 +1,40 @@
 package com.example.namhockey
+
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.ui.graphics.Color
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import com.google.firebase.auth.FirebaseAuth
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-
-import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import androidx.compose.ui.res.stringResource
-import androidx.compose.foundation.layout.Row
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
-
-
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun Signup(navController: NavController) {
 
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
 
     val name = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
@@ -78,8 +58,25 @@ fun Signup(navController: NavController) {
             auth.signInWithCredential(credential)
                 .addOnCompleteListener { authTask ->
                     if (authTask.isSuccessful) {
-                        Toast.makeText(context, "Google sign-in successful", Toast.LENGTH_SHORT).show()
-                        navController.navigate("home")
+                        val user = auth.currentUser
+                        val userInfo = hashMapOf(
+                            "name" to (account.displayName ?: "No Name"),
+                            "email" to (account.email ?: "No Email")
+                        )
+                        if (user != null) {
+                            db.collection("users").document(user.uid)
+                                .set(userInfo)
+                                .addOnSuccessListener {
+                                    Toast.makeText(context, "Google sign-in successful", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("home")
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(context, "Failed to save user data: ${it.message}", Toast.LENGTH_SHORT).show()
+                                }
+                        } else {
+                            Toast.makeText(context, "Google sign-in successful, but user is null", Toast.LENGTH_SHORT).show()
+                            navController.navigate("home")
+                        }
                     } else {
                         Toast.makeText(context, "Google sign-in failed", Toast.LENGTH_SHORT).show()
                     }
@@ -95,7 +92,7 @@ fun Signup(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.hockeylogin), // Same logo
+            painter = painterResource(id = R.drawable.hockeylogin),
             contentDescription = "Hockey Logo",
             modifier = Modifier.size(200.dp)
         )
@@ -112,12 +109,12 @@ fun Signup(navController: NavController) {
 
         OutlinedTextField(
             value = name.value,
-            onValueChange = {name.value = it},
+            onValueChange = { name.value = it },
             label = { Text(text = "Full Name") },
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                focusedLabelColor = Color.Black
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary
             )
         )
 
@@ -125,12 +122,12 @@ fun Signup(navController: NavController) {
 
         OutlinedTextField(
             value = email.value,
-            onValueChange = {email.value= it},
+            onValueChange = { email.value = it },
             label = { Text(text = "Email Address") },
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                focusedLabelColor = Color.Black
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary
             )
         )
 
@@ -138,13 +135,13 @@ fun Signup(navController: NavController) {
 
         OutlinedTextField(
             value = password.value,
-            onValueChange = {password.value = it},
+            onValueChange = { password.value = it },
             label = { Text(text = "Password") },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                focusedLabelColor = Color.Black
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary
             )
         )
 
@@ -152,13 +149,13 @@ fun Signup(navController: NavController) {
 
         OutlinedTextField(
             value = confirmPassword.value,
-            onValueChange = {confirmPassword.value = it},
+            onValueChange = { confirmPassword.value = it },
             label = { Text(text = "Confirm Password") },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                focusedLabelColor = Color.Black
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary
             )
         )
 
@@ -174,24 +171,39 @@ fun Signup(navController: NavController) {
                     auth.createUserWithEmailAndPassword(email.value, password.value)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
-                                navController.navigate("home")
+                                val user = auth.currentUser
+                                if (user != null) {
+                                    val userInfo = hashMapOf(
+                                        "name" to name.value,
+                                        "email" to email.value
+                                    )
+                                    db.collection("users").document(user.uid)
+                                        .set(userInfo)
+                                        .addOnSuccessListener {
+                                            Toast.makeText(context, "Account created and data saved", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("home")
+                                        }
+                                        .addOnFailureListener {
+                                            Toast.makeText(context, "Failed to save user data: ${it.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                } else {
+                                    Toast.makeText(context, "Account created, but user is null", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("home")
+                                }
                             } else {
                                 Toast.makeText(context, "Signup failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                             }
                         }
                 } else {
-                    Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
                 }
             },
-
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF81D4FA),
-                contentColor = Color.Black
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ),
-            border = BorderStroke(1.dp, Color.Black),
-
+            modifier = Modifier.fillMaxWidth(0.7f)
         ) {
             Text(text = "Sign Up")
         }
@@ -205,13 +217,14 @@ fun Signup(navController: NavController) {
             },
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black ),
-            border = BorderStroke(1.dp, Color.Gray)
-
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            modifier = Modifier.fillMaxWidth(0.7f)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.google), // Add your logo in drawable
+                painter = painterResource(id = R.drawable.google),
                 contentDescription = "Google Sign-In",
                 modifier = Modifier.size(20.dp)
             )
@@ -222,8 +235,7 @@ fun Signup(navController: NavController) {
         TextButton(
             onClick = { navController.navigate("Login") }
         ) {
-            Text(text = "Already have an account? Login", color = Color.Black
-            )
+            Text(text = "Already have an account? Login")
         }
     }
 }

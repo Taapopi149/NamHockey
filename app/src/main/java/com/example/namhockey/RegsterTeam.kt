@@ -9,7 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -23,10 +22,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.namhockey.firebasestorage.Team
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,9 +47,14 @@ fun RegisterTeam(navController: NavController) {
     var description by remember { mutableStateOf("") }
     var logoUri by remember { mutableStateOf<Uri?>(null) }
 
+    var isLoading by remember { mutableStateOf(false) }
+
     val imagePickerLauncher = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         logoUri = uri
     }
+
+    val firestore = FirebaseFirestore.getInstance()
+    val storage = FirebaseStorage.getInstance()
 
     Scaffold(
         topBar = {
@@ -111,7 +123,7 @@ fun RegisterTeam(navController: NavController) {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Manager Email") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp)
@@ -121,7 +133,7 @@ fun RegisterTeam(navController: NavController) {
                 value = phone,
                 onValueChange = { phone = it },
                 label = { Text("Phone Number") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp)
@@ -142,22 +154,65 @@ fun RegisterTeam(navController: NavController) {
             Button(
                 onClick = {
                     if (teamName.isNotBlank() && managerName.isNotBlank() && email.isNotBlank() && phone.isNotBlank()) {
-                        Toast.makeText(context, "Team Registered Successfully!", Toast.LENGTH_LONG).show()
-                        navController.popBackStack()
+                        isLoading = true
+
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                // Upload image to Firebase Storage if selected
+                                val logoUrl = if (logoUri != null) {
+                                    val storageRef = storage.reference.child("team_logos/${teamName}_${System.currentTimeMillis()}.jpg")
+                                    storageRef.putFile(logoUri!!).await()
+                                    storageRef.downloadUrl.await().toString()
+                                } else {
+                                    null
+                                }
+
+                                // Create Team object
+                                val team = Team(
+                                    teamName = teamName,
+                                    managerName = managerName,
+                                    email = email,
+                                    phone = phone,
+                                    description = description,
+                                    logoUrl = logoUrl
+                                )
+
+                                // Save to Firestore
+                                firestore.collection("teams").add(team).await()
+
+                                // Return to main thread for UI
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    isLoading = false
+                                    Toast.makeText(context, "Team Registered Successfully!", Toast.LENGTH_LONG).show()
+                                    navController.popBackStack()
+                                }
+                            } catch (e: Exception) {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    isLoading = false
+                                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
                     } else {
                         Toast.makeText(context, "Please fill in all required fields.", Toast.LENGTH_SHORT).show()
                     }
                 },
+                enabled = !isLoading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondaryContainer
                 ),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Submit")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text("Submit")
+                }
             }
         }
     }
 }
-
-

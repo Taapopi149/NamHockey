@@ -8,7 +8,7 @@ interface YouTubeApiService {
     @GET("videos")
     suspend fun getVideoDetails(
         @Query("part") part: String = "snippet",
-        @Query("id") videoIds: String,  // comma-separated
+        @Query("id") videoIds: String,
         @Query("key") apiKey: String
     ): YouTubeResponse
 

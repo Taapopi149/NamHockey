@@ -84,9 +84,10 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
 
 
 
+
     val teamList = listOf(
 
-        teamItem(R.drawable.saintsr, "My Team" ),
+        teamItem(R.drawable.saintsr, "Saints Hockey Club" ),
         teamItem(R.drawable.team3, "The School of excellence hockey Club"),
         teamItem(R.drawable.team5, "Windhoek Old Boys"),
         teamItem(R.drawable.team4, "DTS Hockey Club")
@@ -100,8 +101,8 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
 
     val listState = rememberLazyListState()
 
-
     var drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
@@ -262,6 +263,7 @@ fun HomePage(navController: NavController, newsViewModel: NewsViewModel,
                     }
 
               item {
+
                   SectionTitle("Most Searched Team")
               }
 

@@ -32,7 +32,7 @@ fun Accountpage(
     navController: NavController
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    var name by remember { mutableStateOf("John Doe") }
+    var name by remember { mutableStateOf("User Name") }
     var email by remember { mutableStateOf("user@example.com") }
     var password by remember { mutableStateOf("password123") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -186,7 +186,7 @@ Box (
 ){
 
     Image(
-        painter = painterResource(id = R.drawable.propic),
+        painter = painterResource(id = R.drawable.profilepic),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier

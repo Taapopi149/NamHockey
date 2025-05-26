@@ -54,6 +54,9 @@ dependencies {
 //    ksp("androidx.room:room-compiler:$room_version")
 //    implementation("androidx.room:room-ktx:$room_version")
 
+    implementation ("com.google.firebase:firebase-firestore-ktx:24.10.3")
+    implementation ("com.google.firebase:firebase-storage-ktx:20.3.0")
+
 
     implementation ("com.google.accompanist:accompanist-flowlayout:0.24.3-alpha")
 
@@ -86,6 +89,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.androidx.room.common.jvm)
 
     // Testing
     testImplementation(libs.junit)

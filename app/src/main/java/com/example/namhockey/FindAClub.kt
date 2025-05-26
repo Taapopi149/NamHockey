@@ -1,66 +1,53 @@
 package com.example.namhockey
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import androidx.compose.material3.OutlinedTextField as OutlinedTextField1
+import androidx.navigation.compose.rememberNavController
 
-data class Team(val name: String, val logoUrl: String)
-
+data class Team(val name: String, val logoUrl: Int, val websiteUrl: String)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FindAClub(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
 
-    val teams = listOf(
-        Team("Man City", "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg"),
-        Team("Dortmund", "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg"),
-        Team("PSG", "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg"),
-        Team("Roma", "https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg"),
-        Team("Lyon", "https://upload.wikimedia.org/wikipedia/en/c/c6/Olympique_Lyonnais.svg"),
-        Team("Bayern", "https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_München_logo_%282017%29.svg")
+    val allTeams = listOf(
+        Team("The School of Excellence Hockey Club", R.drawable.team4, "https://namibiahockey.org/club-school-of-excellence/"),
+        Team("Windhoek Old Boys", R.drawable.team5, "https://namibiahockey.org/club-old-boys/"),
+        Team("DTS Hockey Club", R.drawable.team3, "https://namibiahockey.org/club-dts/")
     )
+
+    val filteredTeams = allTeams.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Find A Club") },
+                title = { Text("Find A Club", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -73,11 +60,8 @@ fun FindAClub(navController: NavController) {
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.onSecondary)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField1(
+            OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 label = { Text("Search Teams") },
@@ -91,55 +75,77 @@ fun FindAClub(navController: NavController) {
                 textStyle = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(16.dp),
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             Text(
                 text = "Available Teams",
-                fontSize = 20.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(horizontal = 8.dp)
                     .fillMaxSize(),
-                content = {
-                    items(teams.size) { index ->
-                        TeamCard(team = teams[index])
-                    }
+                contentPadding = PaddingValues(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(filteredTeams.size) { index ->
+                    TeamCard(team = filteredTeams[index])
                 }
-            )
+            }
         }
     }
 }
 
 @Composable
 fun TeamCard(team: Team) {
-    Column(
+    val context = LocalContext.current
+
+    Card(
         modifier = Modifier
-            .padding(8.dp)
-            .background(Color.White, RoundedCornerShape(12.dp))
-            .padding(16.dp)
+            .fillMaxWidth()
+            .clickable {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(team.websiteUrl))
+                context.startActivity(intent)
+            },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(6.dp)
     ) {
-        AsyncImage(
-            model = team.logoUrl,
-            contentDescription = team.name,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = team.name,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.fillMaxWidth()
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = team.logoUrl),
+                contentDescription = team.name,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .height(80.dp)
+                    .fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = team.name,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(horizontal = 4.dp),
+                maxLines = 2
+            )
+        }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun FindAClubPreview() {
+    val navController = rememberNavController()
+    FindAClub(navController = navController)
 }

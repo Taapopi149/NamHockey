@@ -1,64 +1,58 @@
 package com.example.namhockey
 
-import Player
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.namhockey.firebasestorage.Player
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerRegister(navController: NavController) {
     val context = LocalContext.current
 
-    var teamName by remember { mutableStateOf("") }
-    var managerName by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+    var motivation by remember { mutableStateOf("") }
     var logoUri by remember { mutableStateOf<Uri?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
+
+    val storageRef = FirebaseStorage.getInstance().reference
+    val db = FirebaseFirestore.getInstance()
 
     val imagePickerLauncher = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         logoUri = uri
@@ -76,6 +70,7 @@ fun PlayerRegister(navController: NavController) {
             )
         }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -83,35 +78,72 @@ fun PlayerRegister(navController: NavController) {
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Player Registration", fontSize = 22.sp, fontWeight = FontWeight.Bold)
 
-            // Image Picker Preview
+            // Profile Picture Selector with Styled Edit Icon
             Box(
-                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .clickable { imagePickerLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly)) }
-                    .border(1.dp, Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
-                    .padding(8.dp)
+                    .size(160.dp)
+                    .align(Alignment.CenterHorizontally),
+                contentAlignment = Alignment.BottomEnd
             ) {
-                if (logoUri != null) {
-                    Image(
-                        painter = rememberAsyncImagePainter(logoUri),
-                        contentDescription = "Profile ",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(16.dp))
+                Box(
+                    modifier = Modifier
+                        .size(140.dp)
+                        .clip(CircleShape)
+                        .background(Color.LightGray)
+                        .border(2.dp, Color.White, CircleShape)
+                        .clickable {
+                            imagePickerLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                        }
+                        .shadow(8.dp, CircleShape)
+                ) {
+                    if (logoUri != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(logoUri),
+                            contentDescription = "Profile Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Tap to add\nprofile picture",
+                                color = Color.DarkGray,
+                                fontSize = 13.sp,
+                                lineHeight = 18.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.padding(12.dp),
+                            )
+                        }
+                    }
+                }
+
+                IconButton(
+                    onClick = {
+                        imagePickerLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                    },
+                    modifier = Modifier
+                        .offset(x = (-6).dp, y = (-6).dp)
+                        .size(40.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                        .border(1.5.dp, Color.White, CircleShape)
+                        .shadow(4.dp, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit",
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp)
                     )
-                } else {
-                    Text("Tap to select Picture", color = Color.Gray)
                 }
             }
 
             OutlinedTextField(
-                value = teamName,
-                onValueChange = { teamName = it },
+                value = firstName,
+                onValueChange = { firstName = it },
                 label = { Text("First Name(s)") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
@@ -119,8 +151,8 @@ fun PlayerRegister(navController: NavController) {
             )
 
             OutlinedTextField(
-                value = managerName,
-                onValueChange = { managerName = it },
+                value = lastName,
+                onValueChange = { lastName = it },
                 label = { Text("Last Name") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
@@ -131,7 +163,7 @@ fun PlayerRegister(navController: NavController) {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp)
@@ -141,15 +173,15 @@ fun PlayerRegister(navController: NavController) {
                 value = phone,
                 onValueChange = { phone = it },
                 label = { Text("Phone Number") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp)
             )
 
             OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
+                value = motivation,
+                onValueChange = { motivation = it },
                 label = { Text("Motivation") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -161,21 +193,108 @@ fun PlayerRegister(navController: NavController) {
 
             Button(
                 onClick = {
-                    if (teamName.isNotBlank() && managerName.isNotBlank() && email.isNotBlank() && phone.isNotBlank()) {
-                        Toast.makeText(context, "Registered Successfully!", Toast.LENGTH_LONG).show()
-                        navController.popBackStack()
+                    if (isUploading) return@Button
+
+                    if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || phone.isBlank()) {
+                        Toast.makeText(context, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    isUploading = true
+
+                    if (logoUri != null) {
+                        val fileName = UUID.randomUUID().toString() + ".jpg"
+                        val imageRef = storageRef.child("players/$fileName")
+
+                        val uploadTask = imageRef.putFile(logoUri!!)
+                        uploadTask.continueWithTask { task ->
+                            if (!task.isSuccessful) {
+                                task.exception?.let { throw it }
+                            }
+                            imageRef.downloadUrl
+                        }.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val imageUrl = task.result.toString()
+                                savePlayer(
+                                    db,
+                                    Player(
+                                        firstName = firstName,
+                                        lastName = lastName,
+                                        email = email,
+                                        phone = phone,
+                                        motivation = motivation,
+                                        imageUrl = imageUrl
+                                    ),
+                                    context,
+                                    navController,
+                                    onComplete = { isUploading = false }
+                                )
+                            } else {
+                                Toast.makeText(context, "Failed to upload image: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                                isUploading = false
+                            }
+                        }
                     } else {
-                        Toast.makeText(context, "Please fill in all required fields.", Toast.LENGTH_SHORT).show()
+                        savePlayer(
+                            db,
+                            Player(
+                                firstName = firstName,
+                                lastName = lastName,
+                                email = email,
+                                phone = phone,
+                                motivation = motivation,
+                                imageUrl = null
+                            ),
+                            context,
+                            navController,
+                            onComplete = { isUploading = false }
+                        )
                     }
                 },
+                enabled = !isUploading,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Submit")
+                if (isUploading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text("Submit")
+                }
             }
         }
     }
+}
+
+private fun savePlayer(
+    db: FirebaseFirestore,
+    player: Player,
+    context: android.content.Context,
+    navController: NavController,
+    onComplete: () -> Unit
+) {
+    db.collection("players")
+        .add(player)
+        .addOnSuccessListener {
+            Toast.makeText(context, "Registered Successfully!", Toast.LENGTH_LONG).show()
+            navController.popBackStack()
+        }
+        .addOnFailureListener {
+            Toast.makeText(context, "Failed to register: ${it.message}", Toast.LENGTH_LONG).show()
+        }
+        .addOnCompleteListener {
+            onComplete()
+        }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PlayerRegisterPreview() {
+    PlayerRegister(navController = rememberNavController())
 }

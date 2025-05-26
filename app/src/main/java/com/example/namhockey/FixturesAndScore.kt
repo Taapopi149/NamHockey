@@ -1,27 +1,24 @@
 package com.example.namhockey
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
@@ -32,7 +29,6 @@ data class Event(
     val location: String,
     val time: String
 )
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +51,6 @@ fun FixturesAndScores(navController: NavController) {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-
             val upcomingEvents = listOf(
                 Event("24", "JUN", "National Championship", "Windhoek Stadium", "09:00 AM"),
                 Event("30", "JUN", "Junior Tournament", "Sports Complex", "10:30 AM")
@@ -65,32 +60,26 @@ fun FixturesAndScores(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Text("Live Score", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
 
-
-            Text(
-                text = "Live Score",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            LiveMatchCard("TeamA", 3 ,"TeamB", 4 , "78", "")
-            LiveMatchCard("TeamC", 3 ,"TeamD", 4 , "23", "")
-            LiveMatchCard("TeamF", 3 ,"TeamD", 4 , "34", "")
-
-            Spacer(Modifier.height(10.dp))
-            HorizontalDivider()
-            Spacer(Modifier.height(10.dp))
-            Text("Upcoming Fixtures", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
-            // Add your fixture list here
+            LiveMatchCard("Windhoek Old Boys", 3, "DTS Hockey Club", 4, "78'", R.drawable.team5, R.drawable.team4)
+            LiveMatchCard("Saints Hockey Club", 2, "Namibia Masters", 2, "45'", R.drawable.saintsr, R.drawable.namibiahockey)
+            LiveMatchCard("Coastal Raiders", 1, "Sparta Hockey", 0, "23'", R.drawable.coastalraidersr, R.drawable.sparta)
+
+            Spacer(Modifier.height(16.dp))
+            HorizontalDivider()
+
+            Spacer(Modifier.height(10.dp))
+            Text("Upcoming Fixtures", fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
             val upcomingFixtures = listOf(
                 "Namibia vs Zambia" to "12 May 2025 | 16:00",
                 "South Africa vs Kenya" to "14 May 2025 | 18:00"
             )
 
+            Spacer(Modifier.height(8.dp))
             upcomingFixtures.forEach { (match, details) ->
                 Card(
                     modifier = Modifier
@@ -108,32 +97,29 @@ fun FixturesAndScores(navController: NavController) {
                 }
             }
 
-
             Spacer(Modifier.height(10.dp))
             HorizontalDivider()
-
             Spacer(Modifier.height(10.dp))
+
             Text("Group Tables", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
 
             val headers = listOf("Team", "M", "W", "D", "L", "G", "Pts")
             val groupData = listOf(
-                listOf("Bayern Munich", "3", "3", "0", "0", "9:5", "9"),
-                listOf("Galatasaray", "3", "1", "1", "1", "6:7", "4"),
-                listOf("FC Copenhagen", "2", "0", "1", "1", "3:4", "1"),
-                listOf("Manchester United", "2", "0", "0", "2", "5:7", "0")
+                listOf("My Team", "3", "3", "0", "0", "9:5", "9"),
+                listOf("School", "3", "1", "1", "1", "6:7", "4"),
+                listOf("Windhoek Old Boys", "2", "0", "1", "1", "3:4", "1"),
+                listOf("DTS Hockey Club", "2", "0", "0", "2", "5:7", "0")
             )
 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 6.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0D1B2A)), // dark navy
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF0D1B2A)),
                 elevation = CardDefaults.cardElevation(4.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    // Header Row
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -151,7 +137,6 @@ fun FixturesAndScores(navController: NavController) {
                         }
                     }
 
-                    // Data Rows
                     groupData.forEachIndexed { index, row ->
                         Row(
                             modifier = Modifier
@@ -175,8 +160,55 @@ fun FixturesAndScores(navController: NavController) {
                     }
                 }
             }
+        }
+    }
+}
 
+@Composable
+fun TeamIconOnly(iconRes: Int, contentDescription: String) {
+    Image(
+        painter = painterResource(id = iconRes),
+        contentDescription = contentDescription,
+        modifier = Modifier.size(32.dp)
+    )
+}
 
+@Composable
+fun LiveMatchCard(
+    teamA: String,
+    scoreA: Int,
+    teamB: String,
+    scoreB: Int,
+    minute: String,
+    iconARes: Int,
+    iconBRes: Int
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("LIVE $minute", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TeamIconOnly(iconARes, teamA)
+                Text("$scoreA - $scoreB", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                TeamIconOnly(iconBRes, teamB)
+            }
         }
     }
 }
@@ -212,44 +244,6 @@ fun UpcomingEventsSection(events: List<Event>) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(event.time, color = Color.Blue, fontWeight = FontWeight.SemiBold)
                     }
-                }
-            }
-        }
-    }
-}
-
-
-
-@Composable
-fun LiveMatchCard(teamA: String, scoreA: Int, teamB: String, scoreB: Int, minute: String, scorer: String? = null) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("LIVE $minute", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                scorer?.let {
-                    Text(it, fontSize = 12.sp, color = Color.DarkGray)
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(teamA, fontWeight = FontWeight.SemiBold)
-                }
-                Text("$scoreA - $scoreB", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Column {
-                    Text(teamB, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
